@@ -1,15 +1,39 @@
 package controllers
 
-import cryptoAPI "cryptoAPI/src/postgressdb"
+import (
+	cryptoAPI "cryptoAPI/src/postgressdb"
+	"github.com/gin-gonic/gin"
+	"log"
+)
 
-func InsertIntoCryptoTable(cryptoName string, cryptoAmount int, cryptoImageAddress string) {
+type Crypto struct {
+	ID           int    `json:"id"`
+	Name         string `json:"name"`
+	Amount_Owned int    `json:"amount_owned"`
+	Image_Src    string `json:"image_src"`
+}
+
+func GetCryptos(c *gin.Context) {
+
 	db := cryptoAPI.ConnectToDB()
-	sqlStatment := `
-	INSERT INTO crypto (name, amount_owned, image_src)
-	VALUES($1, $2, $3)`
-	_, err := db.Exec(sqlStatment, cryptoName, cryptoAmount, cryptoImageAddress)
+
+	defer db.Close()
+	results, err := db.Query("SELECT * FROM crypto")
 	if err != nil {
-		panic(err)
+
+		log.Fatal(err)
 	}
-	
+	cryptos := []Crypto{}
+	for results.Next() {
+		var crypto Crypto
+
+		err = results.Scan(&crypto.ID, &crypto.Name, &crypto.Amount_Owned, &crypto.Image_Src)
+		if err != nil {
+
+			log.Fatal(err)
+		}
+		cryptos = append(cryptos, crypto)
+	}
+	c.JSON(200, cryptos)
+	return
 }
