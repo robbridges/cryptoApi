@@ -2,7 +2,6 @@ package controllers
 
 import (
 	cryptoAPI "cryptoAPI/src/postgressdb"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -42,18 +41,12 @@ func GetCryptos(c *gin.Context) {
 
 func GetCryptoById(c *gin.Context) {
 	db := cryptoAPI.ConnectToDB()
-
-	coin := Crypto{
-		-1,
-		"not found",
-		0,
-		"not found",
-	}
+	defer db.Close()
+	var coin Crypto
 
 	id := c.Param("id")
 	sqlStatement := `SELECT id, name, amount_owned, image_src FROM crypto WHERE id = $1;`
 	crypto := db.QueryRow(sqlStatement, id)
-	fmt.Println(id)
 	err := crypto.Scan(&coin.ID, &coin.Name, &coin.Amount_Owned, &coin.Image_Src)
 	if err != nil {
 		c.JSON(400, "Error: "+err.Error())
