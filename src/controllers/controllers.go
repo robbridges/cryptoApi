@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type Crypto struct {
@@ -65,13 +66,31 @@ func CreateCrypto(c *gin.Context) {
 	cryptoAmount := c.Query("amount_owned")
 	cryptoImage := c.Query("image_src")
 
-	sqlStatement := `INSERT INTO crypto (name, amount_owned, image_src)
-	VALUES($1, $2, $3)`
+	var coin Crypto
+	id := 0
 
-	_, err := db.Exec(sqlStatement, cryptoName, cryptoAmount, cryptoImage)
+	sqlStatement := `INSERT INTO crypto (name, amount_owned, image_src)
+	VALUES($1, $2, $3)
+	RETURNING id`
+
+	err := db.QueryRow(sqlStatement, cryptoName, cryptoAmount, cryptoImage).Scan(&id)
+
 	if err != nil {
-		log.Fatal(err)
+		c.JSON(http.StatusBadRequest, "Bad request")
+		return
 	}
-	c.Status(201)
+
+	coin.ID = id
+	coin.Name = cryptoName
+	coin.Amount_Owned, err = strconv.Atoi(cryptoAmount)
+	coin.Image_Src = cryptoImage
+
+	c.JSON(201, coin)
 	return
+}
+
+func deleteCoin(c *gin.Context) {
+	db := cryptoAPI.ConnectToDB()
+	defer db.Close()
+
 }
