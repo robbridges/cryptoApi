@@ -4,6 +4,7 @@ import (
 	cryptoAPI "cryptoAPI/src/postgressdb"
 	"github.com/gin-gonic/gin"
 	"log"
+	"net/http"
 )
 
 type Crypto struct {
@@ -35,5 +36,42 @@ func GetCryptos(c *gin.Context) {
 		cryptos = append(cryptos, crypto)
 	}
 	c.JSON(200, cryptos)
+	return
+}
+
+func GetCryptoById(c *gin.Context) {
+	db := cryptoAPI.ConnectToDB()
+	defer db.Close()
+	var coin Crypto
+
+	id := c.Param("id")
+	sqlStatement := `SELECT id, name, amount_owned, image_src FROM crypto WHERE id = $1;`
+	crypto := db.QueryRow(sqlStatement, id)
+	err := crypto.Scan(&coin.ID, &coin.Name, &coin.Amount_Owned, &coin.Image_Src)
+	if err != nil {
+		c.JSON(400, "Error: "+err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, coin)
+	return
+}
+
+func CreateCrypto(c *gin.Context) {
+	db := cryptoAPI.ConnectToDB()
+	defer db.Close()
+
+	cryptoName := c.Query("name")
+	cryptoAmount := c.Query("amount_owned")
+	cryptoImage := c.Query("image_src")
+
+	sqlStatement := `INSERT INTO crypto (name, amount_owned, image_src)
+	VALUES($1, $2, $3)`
+
+	_, err := db.Exec(sqlStatement, cryptoName, cryptoAmount, cryptoImage)
+	if err != nil {
+		log.Fatal(err)
+	}
+	c.Status(201)
 	return
 }
