@@ -56,3 +56,22 @@ func GetCryptoById(c *gin.Context) {
 	c.JSON(http.StatusOK, coin)
 	return
 }
+
+func CreateCrypto(c *gin.Context) {
+	db := cryptoAPI.ConnectToDB()
+	defer db.Close()
+
+	cryptoName := c.Query("name")
+	cryptoAmount := c.Query("amount_owned")
+	cryptoImage := c.Query("image_src")
+
+	sqlStatement := `INSERT INTO crypto (name, amount_owned, image_src)
+	VALUES($1, $2, $3)`
+
+	_, err := db.Exec(sqlStatement, cryptoName, cryptoAmount, cryptoImage)
+	if err != nil {
+		log.Fatal(err)
+	}
+	c.Status(201)
+	return
+}

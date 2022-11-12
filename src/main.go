@@ -33,6 +33,7 @@ func setupRouter() {
 	})
 	router.GET("/crypto", controllers.GetCryptos)
 	router.GET("/crypto/:id", controllers.GetCryptoById)
+	router.POST("/crypto/create", controllers.CreateCrypto)
 	err := router.Run(":8080")
 	if err != nil {
 		log.Fatal()
