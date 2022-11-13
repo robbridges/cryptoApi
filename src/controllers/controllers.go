@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	coin "cryptoAPI/src/models"
 	cryptoAPI "cryptoAPI/src/postgressdb"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -8,12 +9,7 @@ import (
 	"strconv"
 )
 
-type Crypto struct {
-	ID           int    `json:"id"`
-	Name         string `json:"name"`
-	Amount_Owned int    `json:"amount_owned"`
-	Image_Src    string `json:"image_src"`
-}
+type Crypto coin.Crypto
 
 func GetCryptos(c *gin.Context) {
 
