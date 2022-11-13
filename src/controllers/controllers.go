@@ -79,7 +79,7 @@ func CreateCrypto(c *gin.Context) {
 
 	coin.ID = id
 	coin.Name = cryptoName
-	coin.Amount_Owned, err = strconv.Atoi(cryptoAmount)
+	coin.Amount_Owned, err = strconv.ParseFloat(cryptoAmount, 64)
 	coin.Image_Src = cryptoImage
 
 	c.JSON(201, coin)
