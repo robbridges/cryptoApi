@@ -35,6 +35,7 @@ func setupRouter() {
 	router.GET("/crypto/:id", controllers.GetCryptoById)
 	router.POST("/crypto/create", controllers.CreateCrypto)
 	router.DELETE("/crypto/delete/:id", controllers.DeleteCoin)
+	router.PATCH("/crypto/update/amount/:id", controllers.UpdateCoinAmountOwned)
 	err := router.Run(":8080")
 	if err != nil {
 		log.Fatal()
