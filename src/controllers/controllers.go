@@ -3,6 +3,7 @@ package controllers
 import (
 	coin "cryptoAPI/src/models"
 	cryptoAPI "cryptoAPI/src/postgressdb"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -110,4 +111,41 @@ func DeleteCoin(c *gin.Context) {
 	c.Status(http.StatusOK)
 	return
 
+}
+
+func UpdateCoinAmountOwned(c *gin.Context) {
+	db := cryptoAPI.ConnectToDB()
+	defer db.Close()
+
+	id := c.Param("id")
+
+	if c.Query("amount_owned") == "" {
+		c.JSON(http.StatusBadRequest, "An amount_owned query string is required")
+		return
+	}
+	amountOwned := c.Query("amount_owned")
+
+	sqlStatement := `
+	UPDATE crypto
+	SET amount_owned = $2
+	WHERE id = $1;`
+
+	_, err := db.Exec(sqlStatement, id, amountOwned)
+
+	if err != nil {
+		fmt.Println("firstError " + err.Error())
+		c.Status(500)
+		return
+	}
+	var coin Crypto
+	sqlStatement = `SELECT id, name, amount_owned, image_src FROM crypto WHERE id = $1;`
+	crypto := db.QueryRow(sqlStatement, id)
+	err = crypto.Scan(&coin.ID, &coin.Name, &coin.Amount_Owned, &coin.Image_Src)
+	if err != nil {
+		fmt.Println("Second Error " + err.Error())
+		c.Status(500)
+		return
+	}
+
+	c.JSON(http.StatusOK, coin)
 }
