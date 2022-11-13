@@ -137,15 +137,15 @@ func UpdateCoinAmountOwned(c *gin.Context) {
 		c.Status(500)
 		return
 	}
-	var coin Crypto
+	var updatedCoin Crypto
 	sqlStatement = `SELECT id, name, amount_owned, image_src FROM crypto WHERE id = $1;`
 	crypto := db.QueryRow(sqlStatement, id)
-	err = crypto.Scan(&coin.ID, &coin.Name, &coin.Amount_Owned, &coin.Image_Src)
+	err = crypto.Scan(&updatedCoin.ID, &updatedCoin.Name, &updatedCoin.Amount_Owned, &updatedCoin.Image_Src)
 	if err != nil {
 		fmt.Println("Second Error " + err.Error())
 		c.Status(500)
 		return
 	}
 
-	c.JSON(http.StatusOK, coin)
+	c.JSON(http.StatusOK, updatedCoin)
 }
