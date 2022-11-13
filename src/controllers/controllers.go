@@ -32,7 +32,7 @@ func GetCryptos(c *gin.Context) {
 		err = results.Scan(&crypto.ID, &crypto.Name, &crypto.Amount_Owned, &crypto.Image_Src)
 		if err != nil {
 
-			log.Fatal(err)
+			c.JSON(http.StatusInternalServerError, "Error :"+err.Error())
 		}
 		cryptos = append(cryptos, crypto)
 	}
@@ -93,11 +93,21 @@ func DeleteCoin(c *gin.Context) {
 	db := cryptoAPI.ConnectToDB()
 	defer db.Close()
 	id := c.Param("id")
-	sqlStatment := `
+
+	var coin Crypto
+	sqlStatement := `SELECT id FROM crypto WHERE id = $1;`
+	crypto := db.QueryRow(sqlStatement, id)
+	err := crypto.Scan(&coin.ID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, "Error: "+err.Error())
+		return
+	}
+
+	sqlStatement = `
 	DELETE FROM crypto
 	WHERE id = $1;`
 
-	_, err := db.Exec(sqlStatment, id)
+	_, err = db.Exec(sqlStatement, id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, "Error: "+err.Error())
 	}
