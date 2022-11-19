@@ -4,8 +4,6 @@ import (
 	router "cryptoAPI/src/Router"
 	cryptoAPI "cryptoAPI/src/postgressdb"
 	"flag"
-	"fmt"
-
 	_ "github.com/lib/pq"
 )
 
@@ -17,7 +15,7 @@ func main() {
 	flag.Parse()
 	db := cryptoAPI.ConnectToDB()
 	defer db.Close()
-	fmt.Println("And we're live bitches ")
-	fmt.Println(flag.Lookup("url").Value.(flag.Getter).Get())
-	router.SetupRouter()
+	ginRouter := router.SetupRouter()
+	ginRouter.Run(":8080")
+
 }
