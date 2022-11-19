@@ -3,10 +3,9 @@ package Router
 import (
 	"cryptoAPI/src/controllers"
 	"github.com/gin-gonic/gin"
-	"log"
 )
 
-func SetupRouter() {
+func SetupRouter() *gin.Engine {
 	router := gin.Default()
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
@@ -22,8 +21,5 @@ func SetupRouter() {
 		cryptoRoute.PATCH("update/amount/:id", controllers.UpdateCoinAmountOwned)
 	}
 
-	err := router.Run(":8080")
-	if err != nil {
-		log.Fatal()
-	}
+	return router
 }
