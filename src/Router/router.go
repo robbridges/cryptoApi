@@ -13,11 +13,15 @@ func SetupRouter() {
 			"message": "Welcome - the database is up",
 		})
 	})
-	router.GET("/crypto", controllers.GetCryptos)
-	router.GET("/crypto/:id", controllers.GetCryptoById)
-	router.POST("/crypto/create", controllers.CreateCrypto)
-	router.DELETE("/crypto/delete/:id", controllers.DeleteCoin)
-	router.PATCH("/crypto/update/amount/:id", controllers.UpdateCoinAmountOwned)
+	cryptoRoute := router.Group("/crypto")
+	{
+		cryptoRoute.GET("/", controllers.GetCryptos)
+		cryptoRoute.GET("/:id", controllers.GetCryptoById)
+		cryptoRoute.POST("/create", controllers.CreateCrypto)
+		cryptoRoute.DELETE("/delete/:id", controllers.DeleteCoin)
+		cryptoRoute.PATCH("update/amount/:id", controllers.UpdateCoinAmountOwned)
+	}
+
 	err := router.Run(":8080")
 	if err != nil {
 		log.Fatal()
