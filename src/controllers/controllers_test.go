@@ -60,6 +60,22 @@ func (s *UnitTestSuite) TestGetController() {
 	assert.Equal(s.T(), testCryto, crypto)
 }
 
+func (s *UnitTestSuite) TestGetController404() {
+	s.SetupTest()
+	expectedResponse := "Error: sql: no rows in result set"
+	req, err := http.NewRequest("GET", "/crypto/478", nil)
+	w := httptest.NewRecorder()
+	s.r.ServeHTTP(w, req)
+
+	var response string
+	err = json.Unmarshal(w.Body.Bytes(), &response)
+
+	assert.NoError(s.T(), err)
+	assert.Equal(s.T(), http.StatusNotFound, w.Code)
+	assert.Equal(s.T(), expectedResponse, response)
+
+}
+
 func TestUnitTestSuite(t *testing.T) {
 	suite.Run(t, new(UnitTestSuite))
 }
