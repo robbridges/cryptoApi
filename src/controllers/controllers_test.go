@@ -1,21 +1,37 @@
 package controllers_test
 
 import (
-	"cryptoAPI/src/Router"
+	controllers "cryptoAPI/src/controllers"
+	_ "database/sql"
+	"github.com/gin-gonic/gin"
+	_ "github.com/joho/godotenv/autoload"
+	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
-	"net/http"
+	"github.com/stretchr/testify/suite"
 	"net/http/httptest"
 	"testing"
 )
 
-func TestGetController(t *testing.T) {
-	testRouter := Router.SetupRouter()
-	w := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", "/crypto", nil)
-	if err != nil {
-		assert.Equal(t, 200, w.Code)
-	}
-	testRouter.ServeHTTP(w, req)
+type UnitTestSuite struct {
+	suite.Suite
+}
 
-	assert.NotEqual(t, "", w.Body.String())
+func (s *UnitTestSuite) SetupTest() {
+	viper.Set("URL", "localhost")
+	viper.Set("PASSWORD", "postgres")
+	viper.Set("USERNAME", "postgres")
+}
+
+func (s *UnitTestSuite) TestGetController() {
+	s.SetupTest()
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+
+	controllers.GetCryptos(ctx)
+	assert.Equal(s.T(), 200, w.Code)
+}
+
+func TestUnitTestSuite(t *testing.T) {
+	suite.Run(t, new(UnitTestSuite))
 }

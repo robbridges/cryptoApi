@@ -2,16 +2,18 @@ package cryptoAPI
 
 import (
 	"database/sql"
-	"flag"
 	"fmt"
+	_ "github.com/joho/godotenv/autoload"
+	"github.com/spf13/viper"
 )
 
 func ConnectToDB() *sql.DB {
-	dbUrl := flag.Lookup("url").Value.(flag.Getter).Get()
-	dbPass := flag.Lookup("password").Value.(flag.Getter).Get()
-	dbUsername := flag.Lookup("username").Value.(flag.Getter).Get()
+	viper.SetConfigFile("variables.env")
+	viper.ReadInConfig()
+	dbUrl := viper.Get("URL")
+	dbPass := viper.Get("PASSWORD")
+	dbUsername := viper.Get("USERNAME")
 
-	flag.Parse()
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable",
 		dbUrl, 5432, dbUsername, dbPass, dbUsername)
 
