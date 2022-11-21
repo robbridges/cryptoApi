@@ -14,7 +14,7 @@ func SetupRouter() *gin.Engine {
 	})
 	cryptoRoute := router.Group("/crypto")
 	{
-		cryptoRoute.GET("/", controllers.GetCryptos)
+		cryptoRoute.GET("/allcrypto", controllers.GetCryptos)
 		cryptoRoute.GET("/:id", controllers.GetCryptoById)
 		cryptoRoute.POST("/create", controllers.CreateCrypto)
 		cryptoRoute.DELETE("/delete/:id", controllers.DeleteCoin)
