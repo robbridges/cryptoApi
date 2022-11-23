@@ -2,6 +2,7 @@ package main
 
 import (
 	router "cryptoAPI/src/Router"
+	"fmt"
 	_ "github.com/lib/pq"
 	"log"
 )
@@ -13,4 +14,8 @@ func main() {
 		log.Fatal()
 	}
 
+}
+
+func test() {
+	fmt.Println("test")
 }
