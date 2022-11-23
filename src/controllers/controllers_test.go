@@ -1,6 +1,7 @@
 package controllers_test
 
 import (
+	"bytes"
 	router "cryptoAPI/src/Router"
 	"cryptoAPI/src/models"
 	_ "database/sql"
@@ -73,6 +74,23 @@ func (s *UnitTestSuite) TestGetController404() {
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), http.StatusNotFound, w.Code)
 	assert.Equal(s.T(), expectedResponse, response)
+}
+
+func (s *UnitTestSuite) TestPostHander201() {
+	s.SetupTest()
+
+	cryptoExpected := Crypto{4, "fake2", 13.2, "www.fake2.com"}
+	jsonValue, err := json.Marshal(cryptoExpected)
+	req, err := http.NewRequest("POST", "/crypto/create?name=fake2&amount_owned=13.2&image_src=www.fake2.com", bytes.NewBuffer(jsonValue))
+	w := httptest.NewRecorder()
+	s.r.ServeHTTP(w, req)
+	var expected Crypto
+	err = json.Unmarshal(w.Body.Bytes(), &expected)
+	assert.NoError(s.T(), err)
+	assert.Equal(s.T(), http.StatusCreated, w.Code)
+	assert.Equal(s.T(), cryptoExpected.Name, expected.Name)
+	assert.Equal(s.T(), cryptoExpected.Amount_Owned, expected.Amount_Owned)
+	assert.Equal(s.T(), cryptoExpected.Image_Src, expected.Image_Src)
 
 }
 
